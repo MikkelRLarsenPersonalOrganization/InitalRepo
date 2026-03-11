@@ -12,7 +12,7 @@ env:
 
 jobs:
   continous_delivery:
-    runs-on: arc-runner-set   
+    runs-on: ubuntu-latest  
     permissions:
       contents: read
       packages: write     
