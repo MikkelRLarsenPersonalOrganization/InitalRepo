@@ -3,7 +3,7 @@ name: Continous Delivery & Deployment
 on:
   push:
     branches: [master]
-	
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: cicdexample
@@ -53,7 +53,7 @@ jobs:
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
-		  
+
       - name: Update deployment image
         run: |
           kubectl set image deployment/cicdexample cicdexample=${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE_NAME}}:${{ env.TAG}} -n default
