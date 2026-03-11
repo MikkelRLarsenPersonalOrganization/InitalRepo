@@ -57,4 +57,4 @@ jobs:
       - name: Update deployment image
         run: |
           kubectl set image deployment/cicdexample cicdexample=${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE_NAME}}:${{ env.TAG}} -n default
-          kubectl rollout status deployment/cicdexample -n default
+
