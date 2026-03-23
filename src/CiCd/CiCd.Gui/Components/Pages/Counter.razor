@@ -1,9 +1,12 @@
 ﻿@page "/counter"
 @rendermode InteractiveServer
+@inject IConfiguration _config
 
 <PageTitle>Counter</PageTitle>
 
-<h1>Counter ny fra kubernetes pipeline nu uden timeout</h1>
+<h1>Counter ny opdateret</h1>
+
+<h1>@connectionstringName</h1>
 
 <p role="status">Current count: @currentCount</p>
 
@@ -11,9 +14,15 @@
 
 @code {
     private int currentCount = 0;
+    private string connectionstringName = "";
 
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        connectionstringName = _config.GetConnectionString("DefaultConnection");
     }
 }
