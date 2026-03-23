@@ -8,6 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
+COPY Directory.Packages.props ./
 COPY CiCd.Gui/CiCd.Gui.csproj CiCd.Gui/
 COPY CiCd.Facade/CiCd.Facade.csproj CiCd.Facade/
 COPY CiCd.Domain/CiCd.Domain.csproj CiCd.Domain/
