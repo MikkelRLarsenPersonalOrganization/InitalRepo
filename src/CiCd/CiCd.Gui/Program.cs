@@ -1,4 +1,6 @@
 using CiCd.Gui.Components;
+using CiCd.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace CiCd.Gui
 {
@@ -12,7 +14,17 @@ namespace CiCd.Gui
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            builder.Services.AddDbContext<EntityFramework>(options =>
+            {
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    npgsqlOptions => npgsqlOptions.MigrationsAssembly("CiCd.Infrastructure")
+                );
+            });
+            
             var app = builder.Build();
+
+            ApplyMigrations(app);
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -32,6 +44,27 @@ namespace CiCd.Gui
                 .AddInteractiveServerRenderMode();
 
             app.Run();
+        }
+
+        private static void ApplyMigrations(WebApplication app)
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<EntityFramework>();
+
+                // Check and apply pending migrations
+                var pendingMigrations = dbContext.Database.GetPendingMigrations();
+                if (pendingMigrations.Any())
+                {
+                    Console.WriteLine("Applying pending migrations...");
+                    dbContext.Database.Migrate();
+                    Console.WriteLine("Migrations applied successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("No pending migrations found.");
+                }
+            }
         }
     }
 }

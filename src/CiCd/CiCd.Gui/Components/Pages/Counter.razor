@@ -1,6 +1,9 @@
 ﻿@page "/counter"
+@using CiCd.Domain
+@using CiCd.Infrastructure
 @rendermode InteractiveServer
 @inject IConfiguration _config
+@inject EntityFramework _context
 
 <PageTitle>Counter</PageTitle>
 
@@ -12,9 +15,15 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+@if(fromDatabase is not null)
+{
+    <h2>@fromDatabase.Id</h2>
+}
+
 @code {
     private int currentCount = 0;
     private string connectionstringName = "";
+    private Person? fromDatabase;
 
     private void IncrementCount()
     {
@@ -24,5 +33,12 @@
     protected override async Task OnInitializedAsync()
     {
         connectionstringName = _config.GetConnectionString("DefaultConnection");
+
+        Person person = new Person("Mikkel", 21435547, DateTime.UtcNow);
+
+        await _context.Persons.AddAsync(person);
+        await _context.SaveChangesAsync();
+
+        fromDatabase = _context.Persons.FirstOrDefault(p => p.Id == person.Id);
     }
 }
