@@ -57,7 +57,7 @@
         await _daprClient.SaveStateAsync("daprstatestore", person.Id.ToString(), person);
         fromDapr = await _daprClient.GetStateAsync<string>("daprstatestore", person.Id.ToString());
 
-        if (fromDatabase.Id == fromDapr) isDaprAndDatabaseSynced = true;
+        if (fromDatabase.Id.ToString() == fromDapr) isDaprAndDatabaseSynced = true;
     }
 
     protected override async Task OnInitializedAsync()
