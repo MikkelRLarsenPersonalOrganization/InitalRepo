@@ -1,3 +1,4 @@
+### Postgres with application and dapr sidecar
 ```
 # PersistentVolumeClaim til PostgreSQL
 apiVersion: v1
@@ -99,7 +100,7 @@ spec:
   selector:
     app: pgadmin
   ports:
-    - port: 9081
+    - port: 9091
       targetPort: 80
 
 ---
@@ -146,10 +147,15 @@ spec:
     metadata:
       labels:
         app: cicdexample
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "cicdexample"
+        dapr.io/app-port: "8001"
+        dapr.io/enable-api-logging: "true"
     spec:
       containers:
         - name: cicdexample
-          image: ghcr.io/mikkelrlarsenpersonalorganization/cicdexample:f9ac989d76008ff99651a8e549290ca11ad12573
+          image: ghcr.io/mikkelrlarsenpersonalorganization/cicdexample:5c47fcdcf09cd1cb347833ff0f9fbec3cb11217e
           ports:
             - containerPort: 8001
           imagePullPolicy: Always
@@ -159,4 +165,141 @@ spec:
                 secretKeyRef:
                   name: postgres-db-secret
                   key: connectionString
+```
+
+### Dapr Statestore and pubsub with Redis
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: daprstatestore-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6
+          args: ["--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: daprstatestore-pvc
+ 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-db
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: daprstatestore
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: redis-db:6379
+  - name: redisPassword
+    value: ""
+  - name: actorStateStore
+    value: "true"
+
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: daprpubsub
+spec:
+  type: pubsub.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: redis-db:6379
+  - name: redisPassword
+    value: ""
+    
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: lockstore
+spec:
+  type: lock.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: redis-db:6379
+  - name: redisPassword
+    value: ""
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redisinsight-service 
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9081
+      targetPort: 5540
+  selector:
+    app: redisinsight
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisinsight 
+  labels:
+    app: redisinsight 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: redisinsight
+  template: 
+    metadata:
+      labels:
+        app: redisinsight 
+    spec:
+      containers:
+      - name:  redisinsight 
+        image: redis/redisinsight:latest 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5540
 ```
