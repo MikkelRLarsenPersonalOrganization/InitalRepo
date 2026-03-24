@@ -54,7 +54,7 @@
         fromDatabase = _context.Persons.FirstOrDefault(p => p.Id == person.Id);
 
 
-        await _daprClient.SaveStateAsync("daprstatestore", person.Id.ToString(), person);
+        await _daprClient.SaveStateAsync("daprstatestore", person.Id.ToString(), person.Id.ToString());
         fromDapr = await _daprClient.GetStateAsync<string>("daprstatestore", person.Id.ToString());
 
         if (fromDatabase.Id.ToString() == fromDapr) isDaprAndDatabaseSynced = true;
