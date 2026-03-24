@@ -18,6 +18,8 @@ namespace CiCd.Domain
             PhoneNumber = phoneNumber;
             Date = date;
         }
+        private Person() { }
+
 
     }
 }
