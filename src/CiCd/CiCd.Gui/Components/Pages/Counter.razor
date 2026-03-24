@@ -44,15 +44,10 @@
     private Person? fromDapr;
     private bool isDaprAndDatabaseSynced = false;
 
-    private void IncrementCount()
+    private async Task IncrementCount()
     {
         currentCount++;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        connectionstringName = _config.GetConnectionString("DefaultConnection");
-
+        
         Person person = new Person("Mikkel", 21435547, DateTime.UtcNow);
 
         await _context.Persons.AddAsync(person);
@@ -65,5 +60,10 @@
         fromDapr = await _daprClient.GetStateAsync<Person>("daprstatestore", person.Id.ToString());
 
         if (fromDatabase.Id == fromDapr.Id) isDaprAndDatabaseSynced = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        connectionstringName = _config.GetConnectionString("DefaultConnection");
     }
 }
