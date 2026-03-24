@@ -8,7 +8,7 @@
     <PackageVersion Include="Aspire.Hosting" Version="13.1.1" />
     <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.2.0" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="13.0.0" />
-    <PackageVersion Include="Dapr.AspNetCore" Version="1.16.1" />
+    <PackageVersion Include="Dapr.AspNetCore" Version="1.17.6" />
     <PackageVersion Include="Dapr.Workflow" Version="1.16.1" />
     <PackageVersion Include="Dutchskull.Aspire.PolyRepo" Version="9.0.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />

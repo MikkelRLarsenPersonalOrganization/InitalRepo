@@ -14,7 +14,9 @@ namespace CiCd.Gui
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddDbContext<EntityFramework>(options =>
+            builder.Services.AddDaprClient();
+
+			builder.Services.AddDbContext<EntityFramework>(options =>
             {
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection"),

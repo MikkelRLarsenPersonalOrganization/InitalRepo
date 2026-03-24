@@ -1,9 +1,11 @@
 ﻿@page "/counter"
 @using CiCd.Domain
 @using CiCd.Infrastructure
+@using Dapr.Client
 @rendermode InteractiveServer
 @inject IConfiguration _config
 @inject EntityFramework _context
+@inject DaprClient _daprClient
 
 <PageTitle>Counter</PageTitle>
 
@@ -17,14 +19,23 @@
 
 @if(fromDatabase is not null)
 {
+    <h1>Data from postgress</h1>
     <h2>@fromDatabase.Id</h2>
     <h3>@fromDatabase.Name</h3>
+}
+
+@if(fromDapr is not null)
+{
+    <h1>Data from Dapr</h1>
+    <h2>@fromDapr.Id</h2>
+    <h3>@fromDapr.Name</h3>
 }
 
 @code {
     private int currentCount = 0;
     private string connectionstringName = "";
     private Person? fromDatabase;
+    private Person? fromDapr;
 
     private void IncrementCount()
     {
@@ -41,5 +52,9 @@
         await _context.SaveChangesAsync();
 
         fromDatabase = _context.Persons.FirstOrDefault(p => p.Id == person.Id);
+
+
+        await _daprClient.SaveStateAsync("daprstatestore", person.Id.ToString(), person);
+        fromDapr = await _daprClient.GetStateAsync<Person>("daprstatestore", person.Id.ToString());
     }
 }
