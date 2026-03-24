@@ -253,6 +253,20 @@ spec:
     value: ""
     
 ---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: lockstore
+spec:
+  type: lock.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: redis-db:6379
+  - name: redisPassword
+    value: ""
+    
+---
 apiVersion: v1
 kind: Service
 metadata:
