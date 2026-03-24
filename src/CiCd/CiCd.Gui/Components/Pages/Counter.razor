@@ -28,9 +28,7 @@
 @if(fromDapr is not null)
 {
     <h1>Data from Dapr</h1>
-    <h2>@fromDapr.Id</h2>
-    <h3>@fromDapr.Name</h3>
-    <h3>@fromDapr.Date</h3>
+    <h2>@fromDapr</h2>
 }
 
 <h1>@isDaprAndDatabaseSynced.ToString()</h1>
@@ -41,7 +39,7 @@
     private int currentCount = 0;
     private string connectionstringName = "";
     private Person? fromDatabase;
-    private Person? fromDapr;
+    private string? fromDapr;
     private bool isDaprAndDatabaseSynced = false;
 
     private async Task IncrementCount()
@@ -57,9 +55,9 @@
 
 
         await _daprClient.SaveStateAsync("daprstatestore", person.Id.ToString(), person);
-        fromDapr = await _daprClient.GetStateAsync<Person>("daprstatestore", person.Id.ToString());
+        fromDapr = await _daprClient.GetStateAsync<string>("daprstatestore", person.Id.ToString());
 
-        if (fromDatabase.Id == fromDapr.Id) isDaprAndDatabaseSynced = true;
+        if (fromDatabase.Id == fromDapr) isDaprAndDatabaseSynced = true;
     }
 
     protected override async Task OnInitializedAsync()
