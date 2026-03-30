@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-api:
-    uses: MikkelRLarsenPersonalOrganization/InitalRepo/.github/workflows/AnotherCD.yml@main
+    uses: ./.github/workflows/AnotherCD.yml
     with:
       image-name: my-api
       docker-context: src/CiCd
