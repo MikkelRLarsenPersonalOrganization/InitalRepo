@@ -1,0 +1,11 @@
+name: Continous Delivery
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  build-api:
+    uses: ./.github/workflows/continous-delivery.yml
+    with:
+      image-name: my-api
+      docker-context: src/CiCd
