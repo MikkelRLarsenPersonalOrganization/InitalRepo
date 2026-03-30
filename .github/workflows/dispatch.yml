@@ -6,6 +6,9 @@ on:
 jobs:
   build-api:
     uses: ./.github/workflows/AnotherCD.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: my-api
       docker-context: src/CiCd
